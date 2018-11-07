@@ -1,0 +1,24 @@
+{
+  "name": "p5-playground",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plysik/p5-playground.git"
+  },
+  "keywords": [
+    "p5",
+    "test",
+    "playground"
+  ],
+  "author": "Piotr Łysik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/plysik/p5-playground/issues"
+  },
+  "homepage": "https://github.com/plysik/p5-playground#readme"
+}
