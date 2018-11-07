@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.js"
   },
+  "homepage": "https://github.com/plysik/p5-playground",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/plysik/p5-playground.git"
@@ -19,6 +20,5 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/plysik/p5-playground/issues"
-  },
-  "homepage": "https://github.com/plysik/p5-playground#readme"
+  }
 }
