@@ -19,9 +19,7 @@ let textPos = {
 function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
   textFromQuery = decodeURI(
-    getURLParams()
-      .text.replace(/\+/g, " ")
-      .trim()
+    (getURLParams().text || "").replace(/\+/g, " ").trim()
   );
   textArray = (textFromQuery || lorem).split(" ");
 }
