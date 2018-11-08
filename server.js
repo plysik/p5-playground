@@ -2,6 +2,7 @@
 var http = require("http");
 // Path module
 var path = require("path");
+var url = require("url");
 
 // Using the filesystem module
 var fs = require("fs");
@@ -12,8 +13,9 @@ server.listen(3000);
 console.log("Server started on port 3000");
 
 function handleRequest(req, res) {
-  // What did we request?
-  var pathname = req.url;
+  var parsedUrl = url.parse(req.url, true);
+
+  var { pathname, search } = parsedUrl;
 
   // If blank let's ask for index.html
   if (pathname == "/") {
