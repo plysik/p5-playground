@@ -11,6 +11,7 @@ let textFromQuery = null;
 let hash = null;
 let fontSize = 192;
 let textIndex = 0;
+let translateX = 0;
 let margin = 20;
 let points = [];
 let bounds = {};
@@ -34,6 +35,9 @@ function setup() {
   startDisplay();
   setInterval(startDisplay, 2000);
 }
+window.onresize = function() {
+  canvas = createCanvas(layout.windowWidth(), layout.windowHeight());
+};
 
 function startDisplay() {
   changeText(textIndex);
@@ -42,8 +46,14 @@ function startDisplay() {
 }
 
 function changeText(index) {
-  points = font.textToPoints(textArray[index], textPos.x, textPos.y, fontSize);
   bounds = font.textBounds(textArray[index], textPos.x, textPos.y, fontSize);
+  if (bounds.w > width) {
+    fontSize *= (width - 2 * margin) / bounds.w;
+    fontSize = Math.floor(fontSize);
+  }
+  points = font.textToPoints(textArray[index], textPos.x, textPos.y, fontSize);
+  let diff = width - 2 * margin - bounds.w;
+  translateX = diff > 0 ? Math.floor(diff / 2) : margin;
   points.map((p, index) => {
     let vehicle;
     if (vehicles[index]) {
@@ -55,7 +65,7 @@ function changeText(index) {
       vehicle = new Vehicle(p.x, p.y, sourceV.pos.x, sourceV.pos.y);
       vehicles.push(vehicle);
     } else {
-      vehicle = new Vehicle(p.x, p.y, textPos.x, textPos.y);
+      vehicle = new Vehicle(p.x, p.y, width / 2, height / 2);
       vehicles.push(vehicle);
     }
   });
@@ -72,21 +82,18 @@ function changeText(index) {
 
 function draw() {
   background(255, 221, 0);
-  if (bounds.w > width) {
-    fontSize *= (width - margin * 2) / bounds.w;
-    fontSize = Math.floor(fontSize);
-    points = font.textToPoints(
-      textArray[textIndex],
-      textPos.x,
-      textPos.y,
-      fontSize
-    );
-    startDisplay();
-  }
-  // let s = width / bounds.w;
-  // if (s > 1.6) s = 1.6;
-  translate(margin, height / 2);
-  // scale(s);
+  // if (bounds.w > width) {
+  //   fontSize *= (width - margin * 2) / bounds.w;
+  //   fontSize = Math.floor(fontSize);
+  //   points = font.textToPoints(
+  //     textArray[textIndex],
+  //     textPos.x,
+  //     textPos.y,
+  //     fontSize
+  //   );
+  //   startDisplay();
+  // }
+  translate(translateX, height / 2);
 
   vehicles.map(v => {
     v.behaviors();
