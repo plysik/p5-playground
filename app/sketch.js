@@ -22,7 +22,7 @@ function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
   let params = getURLParams();
   textFromQuery = decodeURI((params.text || "").replace(/\+/g, " ").trim());
-  hash = atob(params.hash);
+  if (params.hash) hash = atob(params.hash);
   textArray = (textFromQuery || hash || lorem).split(" ");
 }
 function setup() {
