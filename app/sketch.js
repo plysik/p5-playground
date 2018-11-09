@@ -8,26 +8,28 @@ Tootsie roll lollipop lollipop caramels dragée icing oat cake. Cookie wafer can
 Cake jujubes sweet roll topping fruitcake tiramisu marzipan apple pie. Gingerbread powder jelly. Cheesecake chocolate biscuit candy lemon drops. Cookie chocolate bar macaroon lollipop I love donut cheesecake bear claw chocolate bar. Jujubes cupcake I love caramels. Chocolate cake sesame snaps jelly beans dessert. Apple pie toffee apple pie chupa chups I love sweet halvah. Toffee jujubes jelly-o brownie. Sweet donut wafer muffin oat cake pudding icing icing. Tart chocolate caramels tart croissant. Bonbon tart soufflé gingerbread chocolate. Chupa chups cheesecake jelly I love jujubes I love.`;
 let textArray = [];
 let textFromQuery = null;
-
+let hash = null;
 let fontSize = 192;
 let textIndex = 0;
+let margin = 20;
 let points = [];
+let bounds = {};
 let textPos = {
   x: 0,
   y: 0
 };
 function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
-  textFromQuery = decodeURI(
-    (getURLParams().text || "").replace(/\+/g, " ").trim()
-  );
-  textArray = (textFromQuery || lorem).split(" ");
+  let params = getURLParams();
+  textFromQuery = decodeURI((params.text || "").replace(/\+/g, " ").trim());
+  hash = atob(params.hash);
+  textArray = (textFromQuery || hash || lorem).split(" ");
 }
 function setup() {
   canvas = createCanvas(layout.windowWidth(), layout.windowHeight());
   textPos = {
-    x: 50,
-    y: height / 2
+    x: 0,
+    y: 0
   };
   startDisplay();
   setInterval(startDisplay, 2000);
@@ -41,32 +43,51 @@ function startDisplay() {
 
 function changeText(index) {
   points = font.textToPoints(textArray[index], textPos.x, textPos.y, fontSize);
-
-  if (points.length < vehicles.length) {
-    vehicles = vehicles.slice(0, points.length);
-  }
+  bounds = font.textBounds(textArray[index], textPos.x, textPos.y, fontSize);
   points.map((p, index) => {
+    let vehicle;
     if (vehicles[index]) {
-      vehicles[index].setTarget(p.x, p.y);
-    } else if (vehicles.length > 0 && index > vehicles.length) {
-      let vehicle = Object.assign({}, vehicles[index % vehicles.length]);
+      vehicle = vehicles[index];
       vehicle.setTarget(p.x, p.y);
+    } else if (vehicles.length > 0) {
+      let randomIndex = Math.floor(random(vehicles.length));
+      let sourceV = vehicles[randomIndex];
+      vehicle = new Vehicle(p.x, p.y, sourceV.pos.x, sourceV.pos.y);
       vehicles.push(vehicle);
     } else {
-      let vehicle = vehicles[index % vehicles.length];
-      if (!vehicle) vehicles.push(new Vehicle(p.x, p.y));
-      else {
-        vehicle = new Vehicle(p.x, p.y, vehicle.pos.x, vehicle.pos.y);
-        vehicles.push(vehicle);
-      }
-      // debugger;
-      // vehicles.push(new Vehicle(p.x, p.y));
+      vehicle = new Vehicle(p.x, p.y, textPos.x, textPos.y);
+      vehicles.push(vehicle);
     }
   });
+
+  if (points.length < vehicles.length) {
+    vehicles.slice(points.length, vehicles.length).map((v, index) => {
+      let sourceVIndex = Math.floor(random(points.length - 1));
+      let targetV = vehicles[points.length + index];
+      let sourceV = points[sourceVIndex];
+      targetV.setTarget(sourceV.x, sourceV.y);
+    });
+  }
 }
 
 function draw() {
   background(255, 221, 0);
+  if (bounds.w > width) {
+    fontSize *= (width - margin * 2) / bounds.w;
+    fontSize = Math.floor(fontSize);
+    points = font.textToPoints(
+      textArray[textIndex],
+      textPos.x,
+      textPos.y,
+      fontSize
+    );
+    startDisplay();
+  }
+  // let s = width / bounds.w;
+  // if (s > 1.6) s = 1.6;
+  translate(margin, height / 2);
+  // scale(s);
+
   vehicles.map(v => {
     v.behaviors();
     v.update();

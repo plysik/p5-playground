@@ -6,8 +6,8 @@ class Vehicle {
     this.acc = createVector();
     this.r = 8;
     this.bg = [80, 140, 255];
-    this.maxSpeed = 10;
-    this.maxForce = 1;
+    this.maxSpeed = 15;
+    this.maxForce = 2;
   }
   update() {
     this.pos.add(this.vel);
