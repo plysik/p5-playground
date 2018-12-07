@@ -19,6 +19,8 @@ let textPos = {
 let speech;
 let speechEnabled = false;
 let initTextCleared = false;
+let translateX = 0;
+let translateY = 0;
 
 function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
@@ -34,7 +36,7 @@ function preload() {
 function setup() {
   canvas = createCanvas(layout.windowWidth(), layout.windowHeight());
   textPos = {
-    x: 50,
+    x: 0,
     y: height / 2
   };
   printText();
@@ -62,31 +64,47 @@ function getSpeechToText(text) {
 }
 
 function changeText(text) {
+  const margin = 20;
+  const bounds = font.textBounds(text, textPos.x, textPos.y, fontSize);
+  const scale = (layout.windowWidth() - 2 * margin) / bounds.w;
+  fontSize *= scale;
+  fontSize = Math.floor(fontSize);
   points = font.textToPoints(text, textPos.x, textPos.y, fontSize);
+  const nextBounds = font.textBounds(text, textPos.x, textPos.y, fontSize);
+  translateX = (layout.windowWidth() - nextBounds.w) / 2;
+  translateY = margin + nextBounds.h / 2;
+  translateX = Math.floor(translateX);
+  translateY = Math.floor(translateY);
 
-  if (points.length < vehicles.length) {
-    vehicles = vehicles.slice(0, points.length);
-  }
   points.map((p, index) => {
+    let vehicle;
     if (vehicles[index]) {
-      vehicles[index].setTarget(p.x, p.y);
-    } else if (vehicles.length > 0 && index > vehicles.length) {
-      let vehicle = Object.assign({}, vehicles[index % vehicles.length]);
+      vehicle = vehicles[index];
       vehicle.setTarget(p.x, p.y);
+    } else if (vehicles.length > 0) {
+      let randomIndex = Math.floor(random(vehicles.length));
+      let sourceV = vehicles[randomIndex];
+      vehicle = new Vehicle(p.x, p.y, sourceV.pos.x, sourceV.pos.y);
       vehicles.push(vehicle);
     } else {
-      let vehicle = vehicles[index % vehicles.length];
-      if (!vehicle) vehicles.push(new Vehicle(p.x, p.y));
-      else {
-        vehicle = new Vehicle(p.x, p.y, vehicle.pos.x, vehicle.pos.y);
-        vehicles.push(vehicle);
-      }
+      vehicle = new Vehicle(p.x, p.y, width / 2, height / 2);
+      vehicles.push(vehicle);
     }
   });
+
+  if (points.length < vehicles.length) {
+    vehicles.slice(points.length, vehicles.length).map((v, index) => {
+      let sourceVIndex = Math.floor(random(points.length - 1));
+      let targetV = vehicles[points.length + index];
+      let sourceV = points[sourceVIndex];
+      targetV.setTarget(sourceV.x, sourceV.y);
+    });
+  }
 }
 
 function draw() {
   background(255, 221, 0);
+  translate(translateX, translateY);
   vehicles.map(v => {
     v.behaviors()
       .update()

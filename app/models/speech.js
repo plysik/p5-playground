@@ -12,10 +12,10 @@ class Speech {
       this
     );
     this.speechRecognition.onstart = e => {
-      console.log("onstart", e);
+      // console.log("onstart", e);
     };
     this.speechRecognition.onerror = e => {
-      console.log("onerror", e);
+      // console.log("onerror", e);
     };
   }
 
