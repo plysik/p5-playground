@@ -17,12 +17,19 @@ let textPos = {
   y: 0
 };
 let speech;
+let speechEnabled = false;
+let initTextCleared = false;
+
 function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
-  textFromQuery = decodeURI(
-    (getURLParams().text || "").replace(/\+/g, " ").trim()
-  );
+  let { text, speech } = getURLParams();
+  textFromQuery = decodeURI((text || "").replace(/\+/g, " ").trim());
   textArray = (textFromQuery || lorem).split(" ");
+  if (speech) {
+    speechEnabled = true;
+    navigator.mediaDevices.getUserMedia({ audio: true });
+    textArray = ["Powiedz coś :)"];
+  }
 }
 function setup() {
   canvas = createCanvas(layout.windowWidth(), layout.windowHeight());
@@ -30,16 +37,28 @@ function setup() {
     x: 50,
     y: height / 2
   };
-  speech = new Speech(changeText);
-  speech.start();
-  // startDisplay();
-  // setInterval(startDisplay, 2000);
+  printText();
+  if (speechEnabled) {
+    speech = new Speech(getSpeechToText);
+    speech.start();
+  }
+  setInterval(printText, 2000);
 }
 
-function startDisplay() {
+function printText() {
   changeText(textArray[textIndex]);
   textIndex++;
   if (textIndex === textArray.length) textIndex = 0;
+}
+
+function getSpeechToText(text) {
+  if (initTextCleared) {
+    textArray.push(text);
+  } else {
+    textArray[0] = text;
+    initTextCleared = true;
+  }
+  navigator.mediaDevices.getUserMedia({ audio: true });
 }
 
 function changeText(text) {
@@ -62,8 +81,6 @@ function changeText(text) {
         vehicle = new Vehicle(p.x, p.y, vehicle.pos.x, vehicle.pos.y);
         vehicles.push(vehicle);
       }
-      // debugger;
-      // vehicles.push(new Vehicle(p.x, p.y));
     }
   });
 }

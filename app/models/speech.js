@@ -8,7 +8,9 @@ class Speech {
     this.speechRecognition.continuous = true;
     this.speechRecognition.interimResults = true;
     this.speechRecognition.maxAlternatives = 1;
-    this.speechRecognition.onresult = this.printSpeechRecognitionResults;
+    this.speechRecognition.onresult = this.printSpeechRecognitionResults.bind(
+      this
+    );
     this.speechRecognition.onstart = e => {
       console.log("onstart", e);
     };
@@ -26,21 +28,21 @@ class Speech {
   }
 
   capitalize(s) {
-    return s.replace(first_char, function(m) {
+    return s.replace(this.first_char(), function(m) {
       return m.toUpperCase();
     });
   }
 
   printSpeechRecognitionResults(e) {
-    console.log(e);
-    let result = "";
+    // let result = "";
     if (typeof e.results == "undefined") {
       return;
     }
-    for (let i = e.resultIndex; i < e.results.length; ++i) {
-      result += e.results[i][0].transcript;
+    let lastIndex = e.results.length - 1;
+    if (e.results[lastIndex].isFinal) {
+      const result = e.results[lastIndex][0].transcript;
+      // console.log(result);
+      this.onResultCallback(this.capitalize(result));
     }
-    console.log(result);
-    this.onResultCallback(this.capitalize(result));
   }
 }
