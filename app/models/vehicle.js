@@ -13,6 +13,7 @@ class Vehicle {
     this.pos.add(this.vel);
     this.vel.add(this.acc);
     this.acc.mult(0);
+    return this;
   }
   setTarget(x, y) {
     this.target = createVector(x, y);
@@ -21,6 +22,7 @@ class Vehicle {
   behaviors() {
     let arrive = this.arrive(this.target);
     this.applyForce(arrive);
+    return this;
   }
 
   arrive(target) {
@@ -44,5 +46,6 @@ class Vehicle {
     stroke(...this.bg);
     strokeWeight(this.r);
     point(this.pos.x, this.pos.y);
+    return this;
   }
 }

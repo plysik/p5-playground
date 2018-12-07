@@ -16,6 +16,7 @@ let textPos = {
   x: 0,
   y: 0
 };
+let speech;
 function preload() {
   font = loadFont("assets/Lato-Regular.ttf");
   textFromQuery = decodeURI(
@@ -29,18 +30,20 @@ function setup() {
     x: 50,
     y: height / 2
   };
-  startDisplay();
-  setInterval(startDisplay, 2000);
+  speech = new Speech(changeText);
+  speech.start();
+  // startDisplay();
+  // setInterval(startDisplay, 2000);
 }
 
 function startDisplay() {
-  changeText(textIndex);
+  changeText(textArray[textIndex]);
   textIndex++;
   if (textIndex === textArray.length) textIndex = 0;
 }
 
-function changeText(index) {
-  points = font.textToPoints(textArray[index], textPos.x, textPos.y, fontSize);
+function changeText(text) {
+  points = font.textToPoints(text, textPos.x, textPos.y, fontSize);
 
   if (points.length < vehicles.length) {
     vehicles = vehicles.slice(0, points.length);
@@ -68,8 +71,8 @@ function changeText(index) {
 function draw() {
   background(255, 221, 0);
   vehicles.map(v => {
-    v.behaviors();
-    v.update();
-    v.show();
+    v.behaviors()
+      .update()
+      .show();
   });
 }
